@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>決済結果</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 60px auto; padding: 0 16px; }
+    #status { font-size: 18px; margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <h2>決済結果</h2>
+  <div id="status">確認中...</div>
+
+  <script>
+    (async () => {
+      const { publishableKey } = await fetch('/config').then(r => r.json());
+      const stripe = Stripe(publishableKey);
+
+      const clientSecret = new URLSearchParams(window.location.search).get('payment_intent_client_secret');
+      const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
+
+      const el = document.getElementById('status');
+      switch (paymentIntent.status) {
+        case 'succeeded':
+          el.textContent = '決済成功！ありがとうございました。';
+          break;
+        case 'processing':
+          el.textContent = '処理中です。しばらくお待ちください。';
+          break;
+        case 'requires_payment_method':
+          el.textContent = '決済に失敗しました。別のカードをお試しください。';
+          break;
+        default:
+          el.textContent = `ステータス: ${paymentIntent.status}`;
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>決済デモ</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 60px auto; padding: 0 16px; }
+    #payment-element { margin: 24px 0; }
+    button { width: 100%; padding: 12px; font-size: 16px; background: #635bff; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #message { margin-top: 16px; color: #d32f2f; }
+  </style>
+</head>
+<body>
+  <h2>商品を購入する（¥1,000）</h2>
+  <form id="payment-form">
+    <div id="payment-element"></div>
+    <button id="submit-btn">購入する</button>
+    <div id="message"></div>
+  </form>
+
+  <script>
+    (async () => {
+      // 1. 公開鍵を取得して Stripe を初期化
+      const { publishableKey } = await fetch('/config').then(r => r.json());
+      const stripe = Stripe(publishableKey);
+
+      // 2. PaymentIntent を作成して clientSecret を取得
+      const { clientSecret } = await fetch('/create-payment-intent', { method: 'POST' }).then(r => r.json());
+
+      // 3. Payment Element をマウント
+      const elements = stripe.elements({ clientSecret });
+      const paymentElement = elements.create('payment');
+      paymentElement.mount('#payment-element');
+
+      // 4. フォーム送信 → 決済確定
+      const form = document.getElementById('payment-form');
+      const btn = document.getElementById('submit-btn');
+      const message = document.getElementById('message');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+
+        const { error } = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: `${window.location.origin}/return.html`,
+          },
+        });
+
+        if (error) {
+          message.textContent = error.message;
+          btn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
