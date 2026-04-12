@@ -25,6 +25,9 @@ func CreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
 			Enabled: stripe.Bool(true),
 		},
 	}
+
+	// 冪等性キーを設定する
+	// 同じキーで同じリクエストを複数回送信しても、Stripe は最初のリクエストの結果を返し、二重処理を防ぐ仕組み
 	params.SetIdempotencyKey(idempotencyKey)
 
 	pi, err := paymentintent.New(params)

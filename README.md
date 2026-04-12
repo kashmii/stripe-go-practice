@@ -52,7 +52,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ## 使用技術
 
 - Go
-- [stripe-go](https://github.com/stripe/stripe-go) v76+
+- [stripe-go](https://github.com/stripe/stripe-go) v85+
 - Stripe CLI（Webhookのローカル転送用）
 - Stripe.js + Payment Element（フロントエンド）
 
@@ -61,18 +61,21 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ## 開発の進め方
 
 ### Day 1 — 環境整備 ＋ PaymentIntent作成
+
 - Stripeテストキー取得・環境変数設定
 - `POST /create-payment-intent` の実装
 - フロントエンド（HTML1枚）でボタン押下→決済UIの起動
 - テストカードで決済成功を確認
 
 ### Day 2 — Webhook受信 ＋ fraudCheck挿入
+
 - Stripe CLIでWebhookをローカルに転送
 - `POST /webhook` の実装（署名検証・イベント分岐）
 - `fraud.Check()` の実装と挿入
 - E2Eで通しテスト
 
 ### Day 3 — 理解の深化 ＋ 整理
+
 - IdempotencyKeyの追加
 - エラーハンドリングの整理
 - fraudCheckのルール拡張
@@ -82,9 +85,9 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ## テストカード
 
-| カード番号 | 結果 |
-|---|---|
-| `4242 4242 4242 4242` | 決済成功 |
+| カード番号            | 結果                   |
+| --------------------- | ---------------------- |
+| `4242 4242 4242 4242` | 決済成功               |
 | `4000 0000 0000 0002` | 決済失敗（カード拒否） |
 
 ---
