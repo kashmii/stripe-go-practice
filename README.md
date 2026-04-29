@@ -58,31 +58,6 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ---
 
-## 開発の進め方
-
-### Day 1 — 環境整備 ＋ PaymentIntent作成
-
-- Stripeテストキー取得・環境変数設定
-- `POST /create-payment-intent` の実装
-- フロントエンド（HTML1枚）でボタン押下→決済UIの起動
-- テストカードで決済成功を確認
-
-### Day 2 — Webhook受信 ＋ fraudCheck挿入
-
-- Stripe CLIでWebhookをローカルに転送
-- `POST /webhook` の実装（署名検証・イベント分岐）
-- `fraud.Check()` の実装と挿入
-- E2Eで通しテスト
-
-### Day 3 — 理解の深化 ＋ 整理
-
-- IdempotencyKeyの追加
-- エラーハンドリングの整理
-- fraudCheckのルール拡張
-- コード全体の読み返し・コメント整備
-
----
-
 ## テストカード
 
 | カード番号            | 結果                   |

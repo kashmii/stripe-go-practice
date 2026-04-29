@@ -32,13 +32,7 @@ func CreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
 
 	pi, err := paymentintent.New(params)
 	if err != nil {
-		stripeErr, ok := err.(*stripe.Error)
-		if ok {
-			log.Printf("Stripe error: type=%s code=%s msg=%s", stripeErr.Type, stripeErr.Code, stripeErr.Msg)
-		} else {
-			log.Printf("Unexpected error: %v", err)
-		}
-		http.Error(w, "failed to create payment intent", http.StatusInternalServerError)
+		handleStripeError(w, err)
 		return
 	}
 
@@ -46,4 +40,40 @@ func CreatePaymentIntent(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(createPaymentIntentResponse{
 		ClientSecret: pi.ClientSecret,
 	})
+}
+
+// handleStripeError は Stripe APIから返ったエラーを種類ごとに分類してログ出力・レスポンスを返す
+func handleStripeError(w http.ResponseWriter, err error) {
+	stripeErr, ok := err.(*stripe.Error)
+	if !ok {
+		// Stripe に届く前に発生したネットワークエラーなど
+		log.Printf("[error] unexpected error: %v", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	switch stripeErr.Type {
+	case stripe.ErrorTypeCard:
+		// カードエラー：拒否理由（DeclineCode）でさらに分類する
+		switch stripeErr.DeclineCode {
+		case stripe.DeclineCodeFraudulent:
+			// Stripe Radar が不正と判定した
+			log.Printf("[error] fraudulent card: %s", stripeErr.Msg)
+			http.Error(w, "payment not allowed", http.StatusForbidden)
+		default:
+			// 残高不足・有効期限切れなど一般的なカード拒否
+			log.Printf("[error] card declined: code=%s msg=%s", stripeErr.DeclineCode, stripeErr.Msg)
+			http.Error(w, "card declined", http.StatusPaymentRequired)
+		}
+
+	case stripe.ErrorTypeInvalidRequest:
+		// 必須パラメータ不足など（実装ミス）
+		log.Printf("[error] invalid request: %s", stripeErr.Msg)
+		http.Error(w, "bad request", http.StatusBadRequest)
+
+	default:
+		// APIエラー・認証エラーなどその他
+		log.Printf("[error] stripe error: type=%s code=%s msg=%s", stripeErr.Type, stripeErr.Code, stripeErr.Msg)
+		http.Error(w, "payment error", http.StatusInternalServerError)
+	}
 }
