@@ -1,4 +1,4 @@
-package handler
+package webhook
 
 import (
 	"encoding/json"
@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/kashmii/stripe-go-practice/fraud"
+	"github.com/kashmii/stripe-go-practice/internal/fraud"
 	"github.com/stripe/stripe-go/v85"
 	"github.com/stripe/stripe-go/v85/webhook"
 )
 
-func Webhook(w http.ResponseWriter, r *http.Request) {
+func Handle(w http.ResponseWriter, r *http.Request) {
 	// リクエストボディを読み込む
 	body, err := io.ReadAll(r.Body)
 	if err != nil {

@@ -8,7 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
-	"github.com/kashmii/stripe-go-practice/handler"
+	"github.com/kashmii/stripe-go-practice/internal/payment"
+	"github.com/kashmii/stripe-go-practice/internal/webhook"
 	"github.com/stripe/stripe-go/v85"
 )
 
@@ -23,8 +24,8 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-	r.Post("/create-payment-intent", handler.CreatePaymentIntent)
-	r.Post("/webhook", handler.Webhook)
+	r.Post("/create-payment-intent", payment.CreatePaymentIntent)
+	r.Post("/webhook", webhook.Handle)
 	r.Get("/config", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
