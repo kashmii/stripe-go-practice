@@ -73,4 +73,3 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - [Stripe Webhooks](https://stripe.com/docs/webhooks)
 - [stripe-go](https://github.com/stripe/stripe-go)
 - [Stripe CLI](https://stripe.com/docs/stripe-cli)
-- 詳細なチェックリストは `CHECKLIST.md` を参照
