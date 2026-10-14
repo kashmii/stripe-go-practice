@@ -60,6 +60,26 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Printf("[payment_failed] PaymentIntent ID: %s, Amount: %d", pi.ID, pi.Amount)
 
+	// Subscription の Invoice 決済が成功したとき（毎月の自動更新を含む）
+	case "invoice.payment_succeeded":
+		var inv stripe.Invoice
+		if err := json.Unmarshal(event.Data.Raw, &inv); err != nil {
+			log.Printf("Failed to unmarshal Invoice: %v", err)
+			http.Error(w, "failed to parse event", http.StatusBadRequest)
+			return
+		}
+		log.Printf("[invoice.payment_succeeded] Invoice ID: %s, Amount: %d, Customer: %s", inv.ID, inv.AmountPaid, inv.Customer.ID)
+
+	// Subscription のステータスが変化したとき（プラン変更・解約・更新など）
+	case "customer.subscription.updated":
+		var sub stripe.Subscription
+		if err := json.Unmarshal(event.Data.Raw, &sub); err != nil {
+			log.Printf("Failed to unmarshal Subscription: %v", err)
+			http.Error(w, "failed to parse event", http.StatusBadRequest)
+			return
+		}
+		log.Printf("[subscription.updated] Subscription ID: %s, Status: %s", sub.ID, sub.Status)
+
 	default:
 		log.Printf("[ignored] event type: %s", event.Type)
 	}

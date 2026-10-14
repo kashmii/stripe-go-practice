@@ -28,6 +28,7 @@ func main() {
 	r := chi.NewRouter()
 	r.Post("/create-payment-intent", payment.CreatePaymentIntent)
 	r.Post("/subscriptions/customer", subscription.CreateCustomer)
+	r.Post("/subscriptions", subscription.CreateSubscription)
 	r.Post("/webhook", webhook.Handle)
 	r.Get("/config", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
