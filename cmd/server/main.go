@@ -27,6 +27,7 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Post("/create-payment-intent", payment.CreatePaymentIntent)
+	r.Post("/refunds", payment.CreateRefund)
 	r.Post("/subscriptions/customer", subscription.CreateCustomer)
 	r.Post("/subscriptions", subscription.CreateSubscription)
 	r.Post("/webhook", webhook.Handle)
