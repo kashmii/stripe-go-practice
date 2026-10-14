@@ -47,6 +47,8 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		// fraudCheck：ビジネスロジック実行前に不正検知を挟む
 		if err := fraud.Check(&pi); err != nil {
 			log.Printf("[fraud detected] %v", err)
+			// 不正と判定しても、Webhook の受け取り自体は成功なので 200 を返す
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 		log.Printf("[fraud ok] proceeding to business logic")
