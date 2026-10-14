@@ -9,7 +9,7 @@ Stripe決済フローの実装練習プロジェクト。GoでPaymentIntent作�
 - Stripe Payment Intents APIの基本的な使い方を理解する
 - WebhookによるイベントドリブンなフローをGoで実装する
 - 決済フローの中にfraudCheck関数を挿入し、不正検知の仕組みを体感する
-- asukaのJSタグ型不正検知とStripe Radar（APIレイヤー型）の構造的な違いを実装を通じて理解する
+- JSタグ型の不正検知とStripe Radarの構造的な違いを実装を通じて理解する
 
 ---
 
